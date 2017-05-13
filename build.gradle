@@ -6,7 +6,8 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.3'
-
+//        compile files('libs/BaiduLBS_Android.jar');
+//        compile files('libs/httpmime-4.1.2.jar');
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
