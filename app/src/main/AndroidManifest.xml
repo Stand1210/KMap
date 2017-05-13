@@ -15,6 +15,9 @@
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="881ThvzyT1V4t5vtOeWsj2h8BDYxD9oB" />
+        <meta-data
+            android:name="BaiduMobAd_STAT_ID"
+            android:value="48ae76de3f" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"

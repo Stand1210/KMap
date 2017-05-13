@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean hasRequestComAuth = false;
     public static List<Activity> activityList = new LinkedList<Activity>();
     public static final String ROUTE_PLAN_NODE = "routePlanNode";
-
+    private final static String authComArr[] = { Manifest.permission.READ_PHONE_STATE };
 
 
 
@@ -216,8 +216,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 
 
+
         //初始化导航相关
         if (initDirs()) {
+
             initNavi();
         }
     }
@@ -242,7 +244,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     String authinfo = null;
 
 
+
     private void initNavi() {
+
 
         BNOuterTTSPlayerCallback ttsCallback = null;
 
@@ -294,7 +298,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void routeplanToNavi(boolean mock) {
         BNRoutePlanNode.CoordinateType coType = BNRoutePlanNode.CoordinateType.GCJ02;
+        if (!hasInitSuccess) {
+            Toast.makeText(MainActivity.this, "还未初始化!", Toast.LENGTH_SHORT).show();
+        }
+        // 权限申请
+        if (android.os.Build.VERSION.SDK_INT >= 23) {
+            // 保证导航功能完备
+            if (!hasCompletePhoneAuth()) {
+                if (!hasRequestComAuth) {
+                    hasRequestComAuth = true;
+                    this.requestPermissions(authComArr, authComRequestCode);
+                    return;
+                } else {
+                    Toast.makeText(MainActivity.this, "没有完备的权限!", Toast.LENGTH_SHORT).show();
+                }
+            }
 
+        }
         BNRoutePlanNode sNode = null;
         BNRoutePlanNode eNode = null;
 
@@ -309,7 +329,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             List<BNRoutePlanNode> list = new ArrayList<BNRoutePlanNode>();
             list.add(sNode);
             list.add(eNode);
-            BaiduNaviManager.getInstance().launchNavigator(this, list, 1, false, new DemoRoutePlanListener(sNode));
+            BaiduNaviManager.getInstance().launchNavigator(this, list, 1, mock, new DemoRoutePlanListener(sNode));
         }
     }
 
@@ -341,6 +361,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // TODO Auto-generated method stub
             Toast.makeText(MainActivity.this, "算路失败", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private boolean hasCompletePhoneAuth() {
+        // TODO Auto-generated method stub
+
+        PackageManager pm = this.getPackageManager();
+        for (String auth : authComArr) {
+            if (pm.checkPermission(auth, this.getPackageName()) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -662,6 +694,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 //                Toast.makeText(context, location.getAddrStr(), Toast.LENGTH_SHORT).
             }
+        }
+
+
+        @Override
+        public void onConnectHotSpotMessage(String s, int i) {
+
         }
     }
 }
