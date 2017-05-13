@@ -365,13 +365,13 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onReceiveLocation(BDLocation location) {
-            MyLocationData data = new MyLocationData.Builder()//
+            MyLocationData data = new MyLocationData.Builder()//    拿到定位数据
                     .direction(mCurrentX)//在获得定位之后回掉更新方向传感器箭头指向
                     .accuracy(location.getRadius())//
                     .latitude(location.getLatitude())//
                     .longitude(location.getLongitude())//
                     .build();
-            mBaiduMap.setMyLocationData(data);
+            mBaiduMap.setMyLocationData(data);  //用拿到的定位数据更新当前位置
 
             //设置自定义图标
             MyLocationConfiguration config = new MyLocationConfiguration(mLocationMode, true, mIconLocation);
@@ -382,7 +382,7 @@ public class MainActivity extends AppCompatActivity {
             mLongtitude = location.getLongitude();
 
 
-            if (isFirstIn) {
+            if (isFirstIn) {    //第一次定位的话更新当前显示为所定位的位置
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                 MapStatusUpdate msu = MapStatusUpdateFactory.newLatLng(latLng);
                 mBaiduMap.animateMapStatus(msu);
