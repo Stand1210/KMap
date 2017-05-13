@@ -13,9 +13,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -44,12 +46,12 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.util.List;
 
 
-
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     MapView mMapView = null;
     private BaiduMap mBaiduMap;
+    private Button mBtnMockNav;
+    private Button mBtnRealNav;
     private Context context;
 
     //定位相关
@@ -58,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isFirstIn = true;
     private double mLatitude;
     private double mLongtitude;
+    private LatLng mDestLocationData;     //导航目标地址
     //自定义定位图标
     private BitmapDescriptor mIconLocation;
     private MyLocationConfiguration.LocationMode mLocationMode;
@@ -87,6 +90,13 @@ public class MainActivity extends AppCompatActivity {
         initView();
         //初始化定位
         initLocation();
+
+        //导航按钮
+        mBtnMockNav = (Button)findViewById(R.id.id_btn_mocknav);
+        mBtnRealNav = (Button)findViewById(R.id.id_btn_realnav);
+
+        mBtnMockNav.setOnClickListener(this);
+        mBtnRealNav.setOnClickListener(this);
         //初始化覆盖
         initMarker();
 
@@ -99,6 +109,18 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+            }
+        });
+
+        //长按设置目标地点时间监听
+        mBaiduMap.setOnMapLongClickListener(new BaiduMap.OnMapLongClickListener()
+        {
+
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                Toast.makeText(MainActivity.this, "成功设置目的地", Toast.LENGTH_SHORT).show();
+                mDestLocationData = latLng;
+                addDestInfoOverLay(latLng);
             }
         });
 
@@ -157,6 +179,14 @@ public class MainActivity extends AppCompatActivity {
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+    }
+
+    private void addDestInfoOverLay(LatLng latLng) {
+        mBaiduMap.clear();
+        OverlayOptions options = new MarkerOptions().position(latLng)
+                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.maker))
+                .zIndex(5);
+        mBaiduMap.addOverlay(options);
     }
 
     private void initMarker() {
@@ -359,6 +389,14 @@ public class MainActivity extends AppCompatActivity {
                 .setObject(object)
                 .setActionStatus(Action.STATUS_TYPE_COMPLETED)
                 .build();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId())
+        {
+
+        }
     }
 
     private class MyLocationListener implements BDLocationListener {
