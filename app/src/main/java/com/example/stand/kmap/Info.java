@@ -56,7 +56,7 @@ public class Info implements Serializable {
     }
 
     public int getImgId() {
-        return imgId;
+            return imgId;
     }
 
     public void setImgId(int imgId) {

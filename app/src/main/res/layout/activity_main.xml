@@ -13,6 +13,8 @@
         android:layout_height="fill_parent"
         android:clickable="true" />
 
+
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -27,11 +29,32 @@
             <!---->
             <!--android:text="我的位置"/>-->
 
+
+
+        <EditText
+            android:id="@+id/id_edit_city"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="300dp"
+            android:hint="@string/id_edit_city"/>
+
+        <EditText
+            android:id="@+id/id_edit_house"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/id_edit_house"/>
+
+        <Button
+            android:id="@+id/id_btn_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="查询"/>
+
         <Button
             android:id="@+id/id_btn_mocknav"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="450dp"
+
             android:text="模拟导航"/>
 
         <Button
@@ -39,6 +62,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="开始导航"/>
+
+
 
     </LinearLayout>
 
@@ -120,8 +145,13 @@
     </RelativeLayout>
 
 
-
-
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@android:drawable/ic_dialog_email" />
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -136,14 +166,6 @@
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
     </android.support.design.widget.AppBarLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
 
     <include layout="@layout/content_main" />
 

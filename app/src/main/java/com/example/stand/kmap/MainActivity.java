@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -45,6 +46,13 @@ import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.search.core.SearchResult;
+import com.baidu.mapapi.search.poi.OnGetPoiSearchResultListener;
+import com.baidu.mapapi.search.poi.PoiCitySearchOption;
+import com.baidu.mapapi.search.poi.PoiDetailResult;
+import com.baidu.mapapi.search.poi.PoiIndoorResult;
+import com.baidu.mapapi.search.poi.PoiResult;
+import com.baidu.mapapi.search.poi.PoiSearch;
 import com.baidu.navisdk.adapter.BNOuterTTSPlayerCallback;
 import com.baidu.navisdk.adapter.BNRoutePlanNode;
 import com.baidu.navisdk.adapter.BNaviSettingManager;
@@ -105,6 +113,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //覆盖物相关
     private BitmapDescriptor mMarker;
     private RelativeLayout mMarkerLy;//设置布局
+
+    //检索相关
+    private PoiSearch poiSearch;
+    private EditText city;
+    private EditText house;
+    private Button mBtnSearch;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -127,8 +141,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initLocation();
 
         //导航按钮
-        mBtnMockNav = (Button)findViewById(R.id.id_btn_mocknav);
-        mBtnRealNav = (Button)findViewById(R.id.id_btn_realnav);
+        mBtnMockNav = (Button) findViewById(R.id.id_btn_mocknav);
+        mBtnRealNav = (Button) findViewById(R.id.id_btn_realnav);
+
+        city = (EditText)findViewById(R.id.id_edit_city);
+        house = (EditText)findViewById(R.id.id_edit_house);
 
         mBtnMockNav.setOnClickListener(this);
         mBtnRealNav.setOnClickListener(this);
@@ -146,6 +163,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .setAction("Action", null).show();
             }
         });
+
+
+
+
+
+
+
+
+
+
+
+
+        //位置检索
+        poiSearch = PoiSearch.newInstance();
+        MyOnGetPoiSearchResultListener myOnGetPoiSearchResultListener = new MyOnGetPoiSearchResultListener();
+        poiSearch.setOnGetPoiSearchResultListener(myOnGetPoiSearchResultListener);
+
+
+        mBtnSearch = (Button) findViewById(R.id.id_btn_search);
+        mBtnSearch.setOnClickListener(this);
+
+
+
+
+
+
+
+
+
 
         //长按设置目标地点时间监听
         mBaiduMap.setOnMapLongClickListener(new BaiduMap.OnMapLongClickListener()
@@ -647,6 +693,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId())
         {
+            case R.id.id_btn_search:
+                //System.out.println(city.getText().toString());
+
+                PoiCitySearchOption poiCitySearchOption = new PoiCitySearchOption().city(city.getText().toString()).keyword(house.getText().toString());
+                poiSearch.searchInCity(poiCitySearchOption);
+                break;
+
             case R.id.id_btn_mocknav:
                 if (mDestLocationData == null) {
                     Toast.makeText(MainActivity.this, "请先设置目标地点", Toast.LENGTH_SHORT).show();
@@ -662,6 +715,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 routeplanToNavi(true);
                 break;
+
+
         }
     }
 
@@ -702,4 +757,194 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
     }
+
+
+    public class MyOnGetPoiSearchResultListener implements OnGetPoiSearchResultListener {
+        @Override
+        public void onGetPoiResult(PoiResult poiResult) {
+            // 将poi结果显示到地图上
+//                PoiOverlay poiOverlay = new PoiOverlay(mBaiduMap);
+//                poiOverlay.setData(poiResult);
+            if ((poiResult == null)
+                    || (poiResult.error == SearchResult.ERRORNO.RESULT_NOT_FOUND)) {
+                return;
+            }
+            if (poiResult.error == SearchResult.ERRORNO.NO_ERROR) {
+                mBaiduMap.clear();
+                PoiOverlay overlay = new PoiOverlay(mBaiduMap);
+                overlay.setData(poiResult);
+                overlay.addToMap();
+                // 缩放地图，使所有Overlay都在合适的视野内
+                overlay.zoomToSpan();
+                return;
+            }
+            if (poiResult.error == SearchResult.ERRORNO.AMBIGUOUS_KEYWORD) {
+            }
+        }
+
+
+        @Override
+        public void onGetPoiDetailResult(PoiDetailResult poiDetailResult) {
+
+        }
+
+        @Override
+        public void onGetPoiIndoorResult(PoiIndoorResult poiIndoorResult) {
+
+        }
+    }
+
+
+
+//    /**
+//     * 覆盖物
+//     */
+//    private class MyPoiOverlay extends Overlay {
+//        private PoiResult poiResult = null;
+//
+//        public MyPoiOverlay(BaiduMap baiduMap) {
+//            super(baiduMap);
+//        }
+//
+//        public void setData(PoiResult poiResult) {
+//            this.poiResult = poiResult;
+//        }
+//
+//        @Override
+//        public boolean onMarkerClick(Marker marker) {
+//            if (marker.getExtraInfo() != null) {
+//                int index = marker.getExtraInfo().getInt("index");
+//                PoiInfo poi = poiResult.getAllPoi().get(index);
+//
+//                // 详情搜索
+//                poiSearch.searchPoiDetail((new PoiDetailSearchOption())
+//                        .poiUid(poi.uid));
+//                return true;
+//            }
+//            return false;
+//        }
+//
+//        @Override
+//        public List<OverlayOptions> getOverlayOptions() {
+//            if ((this.poiResult == null)
+//                    || (this.poiResult.getAllPoi() == null))
+//                return null;
+//            ArrayList<OverlayOptions> arrayList = new ArrayList<OverlayOptions>();
+//            for (int i = 1; i < this.poiResult.getAllPoi().size(); i++) {
+//                if (this.poiResult.getAllPoi().get(i).location == null)
+//                    continue;
+//                // 给marker加上标签
+//                Bundle bundle = new Bundle();
+//                bundle.putInt("index", i);
+//                arrayList.add(new MarkerOptions()
+//                        .icon(BitmapDescriptorFactory
+//                                .fromBitmap(setNumToIcon(i))).extraInfo(bundle)
+//                        .position(this.poiResult.getAllPoi().get(i).location));
+//            }
+//            return arrayList;
+//        }
+//
+//        /**
+//         * 往图片添加数字
+//         */
+//        private Bitmap setNumToIcon(int num) {
+//            BitmapDrawable bd = (BitmapDrawable) getResources().getDrawable(
+//                    R.drawable.icon_gcoding);
+//            Bitmap bitmap = bd.getBitmap().copy(Bitmap.Config.ARGB_8888, true);
+//            Canvas canvas = new Canvas(bitmap);
+//
+//            Paint paint = new Paint();
+//            paint.setColor(Color.WHITE);
+//            paint.setAntiAlias(true);
+//            int widthX;
+//            int heightY = 0;
+//            if (num < 10) {
+//                paint.setTextSize(30);
+//                widthX = 8;
+//                heightY = 6;
+//            } else {
+//                paint.setTextSize(20);
+//                widthX = 11;
+//            }
+//
+//            canvas.drawText(String.valueOf(num),
+//                    ((bitmap.getWidth() / 2) - widthX),
+//                    ((bitmap.getHeight() / 2) + heightY), paint);
+//            return bitmap;
+//        }
+//
+//    }
+
+//    //自定义poi检索覆盖物
+//    private class MyPoiOverlay extends OverlayManager {
+//        private PoiResult result;
+//        private boolean flag = false;
+//        public void setResult(PoiResult result) {
+//            this.result = result;
+//        }
+//        public MyPoiOverlay(BaiduMap baiduMap) {
+//            super(baiduMap);
+//        }
+//        @Override
+//        public boolean onMarkerClick(Marker marker) {
+//            onClick(marker.getZIndex());
+//            return true;
+//        }
+//        public boolean onClick(int index) {
+//            PoiInfo poi = result.getAllPoi().get(index);
+//            //if(poi.hasCaterDetails){
+//            Mpoisearch.searchPoiDetail((new PoiDetailSearchOption()).poiUid(poi.uid));
+//            // }
+//            return true;
+//        }
+//
+//        @Override
+//        public boolean onPolylineClick(Polyline arg0) {
+//            return false;
+//        }
+//        @Override
+//        public List<OverlayOptions> getOverlayOptions() {
+//            List<OverlayOptions> ops = new ArrayList<OverlayOptions>();
+//            List<PoiInfo> pois = result.getAllPoi();
+//            OverlayOptions op = null;
+//            BitmapDescriptor bitmap = BitmapDescriptorFactory.fromResource(R.drawable.icon_green);
+//            BitmapDescriptor bitmap2 = BitmapDescriptorFactory.fromResource(R.drawable.icon_red);
+//            for (int i = 0; i < pois.size(); i++) {
+//                if(flag){
+//                    op = new MarkerOptions().position(pois.get(i).location).icon(bitmap);
+//                }
+//                else{
+//                    op = new MarkerOptions().position(pois.get(i).location).icon(bitmap2);
+//                }
+//                ops.add(op);
+//                Mmap.addOverlay(op).setZIndex(i);
+//            }
+//            return ops;
+//        }
+//    }
+//
+//
+//    @Override
+//    protected void onPause() {
+//        mapView.onPause();
+//        super.onPause();
+//    }
+//
+//    @Override
+//    protected void onResume() {
+//        mapView.onResume();
+//        super.onResume();
+//    }
+//
+//    @Override
+//    protected void onDestroy() {
+//        MyApp app = (MyApp) getApplication();
+//        app.mLocClient.stop();
+//        mapView.onDestroy();
+//        mapView = null;
+//        super.onDestroy();
+//    }
+//}
 }
+
+
